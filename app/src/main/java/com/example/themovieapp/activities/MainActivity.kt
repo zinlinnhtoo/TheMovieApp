@@ -11,6 +11,7 @@ import com.example.themovieapp.delegates.BannerViewHolderDelegate
 import com.example.themovieapp.delegates.MovieViewHolderDelegate
 import com.example.themovieapp.delegates.ShowcaseViewHolderDelegate
 import com.example.themovieapp.dummy.dummyGenreList
+import com.example.themovieapp.network.dataagents.MovieDataAgentImpl
 import com.example.themovieapp.viewpods.MovieListViewPod
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
@@ -35,6 +36,8 @@ class MainActivity : AppCompatActivity(), BannerViewHolderDelegate, ShowcaseView
         setUpShowcaseRecyclerView()
 
         setUpListeners()
+
+        MovieDataAgentImpl.getNowPlayingMovies()
     }
 
     private fun setUpViewPods() {

@@ -32,7 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/tvBestActors"
         android:layout_marginTop="@dimen/margin_card_medium_2"
-        android:paddingEnd="@dimen/margin_medium_2"
-        android:clipToPadding="false"/>
+        android:clipToPadding="false"
+        android:paddingEnd="@dimen/margin_medium_2" />
 
 </com.example.themovieapp.viewpods.ActorListViewPod>
