@@ -1,8 +1,8 @@
-package com.example.themovieapp.network.dataagents
+package com.example.themovieapp.data.models
 
 import com.example.themovieapp.data.vos.MovieVO
 
-interface MovieDataAgent {
+interface MovieModel {
     fun getNowPlayingMovies(
         onSuccess: (List<MovieVO>) -> Unit,
         onFailure: (String) -> Unit

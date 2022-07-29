@@ -3,15 +3,17 @@ package com.example.themovieapp.activities
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.themovieapp.R
 import com.example.themovieapp.adapters.BannerAdapter
 import com.example.themovieapp.adapters.ShowcaseAdapter
+import com.example.themovieapp.data.models.MovieModel
+import com.example.themovieapp.data.models.MovieModelImpl
 import com.example.themovieapp.delegates.BannerViewHolderDelegate
 import com.example.themovieapp.delegates.MovieViewHolderDelegate
 import com.example.themovieapp.delegates.ShowcaseViewHolderDelegate
 import com.example.themovieapp.dummy.dummyGenreList
-import com.example.themovieapp.network.dataagents.MovieDataAgentImpl
 import com.example.themovieapp.viewpods.MovieListViewPod
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
@@ -25,6 +27,8 @@ class MainActivity : AppCompatActivity(), BannerViewHolderDelegate, ShowcaseView
     lateinit var mBestPopularMovieListViewPod : MovieListViewPod
     lateinit var mMoviesByGenreViewPod: MovieListViewPod
 
+    private val mMovieModel: MovieModel = MovieModelImpl
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -34,10 +38,20 @@ class MainActivity : AppCompatActivity(), BannerViewHolderDelegate, ShowcaseView
         setUpBannerViewPager()
         setUpGenreTabLayout()
         setUpShowcaseRecyclerView()
-
         setUpListeners()
 
-        MovieDataAgentImpl.getNowPlayingMovies()
+//        MovieDataAgentImpl.getNowPlayingMovies()
+//        OkHttpDataAgentImpl.getNowPlayingMovies()
+//        RetrofitDataAgentImpl.getNowPlayingMovies()
+
+        mMovieModel.getNowPlayingMovies(
+            onSuccess = {
+                mBannerAdapter.setNewData(it)
+            },
+            onFailure = {
+                Toast.makeText(this, "Something's wrong", Toast.LENGTH_SHORT).show()
+            }
+        )
     }
 
     private fun setUpViewPods() {
