@@ -7,4 +7,14 @@ interface MovieModel {
         onSuccess: (List<MovieVO>) -> Unit,
         onFailure: (String) -> Unit
     )
+
+    fun getPopularMovies(
+        onSuccess: (List<MovieVO>) -> Unit,
+        onFailure: (String) -> Unit
+    )
+
+    fun getTopRatedMovies(
+        onSuccess: (List<MovieVO>) -> Unit,
+        onFailure: (String) -> Unit
+    )
 }

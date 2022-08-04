@@ -40,18 +40,43 @@ class MainActivity : AppCompatActivity(), BannerViewHolderDelegate, ShowcaseView
         setUpShowcaseRecyclerView()
         setUpListeners()
 
-//        MovieDataAgentImpl.getNowPlayingMovies()
-//        OkHttpDataAgentImpl.getNowPlayingMovies()
-//        RetrofitDataAgentImpl.getNowPlayingMovies()
+        requestData()
+    }
 
+    private fun requestData() {
+        // Now Playing Movies
         mMovieModel.getNowPlayingMovies(
             onSuccess = {
                 mBannerAdapter.setNewData(it)
             },
             onFailure = {
-                Toast.makeText(this, "Something's wrong", Toast.LENGTH_SHORT).show()
+                showError(it)
             }
         )
+
+        // Popular Movies
+        mMovieModel.getPopularMovies(
+            onSuccess = {
+                mBestPopularMovieListViewPod.setData(it)
+            },
+            onFailure = {
+                showError(it)
+            }
+        )
+
+        // Top Rated Movies
+        mMovieModel.getTopRatedMovies(
+            onSuccess = {
+                mShowcaseAdapter.setNewData(it)
+            },
+            onFailure = {
+                showError(it)
+            }
+        )
+    }
+
+    private fun showError(error: String) {
+        Toast.makeText(this, error, Toast.LENGTH_LONG).show()
     }
 
     private fun setUpViewPods() {
