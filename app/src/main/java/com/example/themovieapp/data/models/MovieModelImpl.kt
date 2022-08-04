@@ -1,5 +1,6 @@
 package com.example.themovieapp.data.models
 
+import com.example.themovieapp.data.vos.GenreVO
 import com.example.themovieapp.data.vos.MovieVO
 import com.example.themovieapp.network.dataagents.MovieDataAgent
 import com.example.themovieapp.network.dataagents.RetrofitDataAgentImpl
@@ -24,5 +25,21 @@ object MovieModelImpl: MovieModel {
         onFailure: (String) -> Unit
     ) {
         mMovieDataAgent.getTopRatedMovies(onSuccess, onFailure)
+    }
+
+    override fun getGenre(onSuccess: (List<GenreVO>) -> Unit, onFailure: (String) -> Unit) {
+        mMovieDataAgent.getGenres(onSuccess, onFailure)
+    }
+
+    override fun getMoviesByGenre(
+        genreId: String,
+        onSuccess: (List<MovieVO>) -> Unit,
+        onFailure: (String) -> Unit
+    ) {
+        mMovieDataAgent.getMoviesByGenre(
+            genreId,
+            onSuccess,
+            onFailure
+        )
     }
 }

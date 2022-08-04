@@ -1,7 +1,9 @@
 package com.example.themovieapp.network.dataagents
 
+import com.example.themovieapp.data.vos.GenreVO
 import com.example.themovieapp.data.vos.MovieVO
 import com.example.themovieapp.network.TheMovieApi
+import com.example.themovieapp.network.responses.GetGenreResponse
 import com.example.themovieapp.network.responses.MovieListResponse
 import com.example.themovieapp.utils.BASE_URL
 import okhttp3.OkHttpClient
@@ -85,6 +87,49 @@ object RetrofitDataAgentImpl: MovieDataAgent {
         onFailure: (String) -> Unit
     ) {
         mTheMovieApi?.getTopRatedMovies()?.enqueue(
+            object : Callback<MovieListResponse> {
+                override fun onResponse(
+                    call: Call<MovieListResponse>,
+                    response: Response<MovieListResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        val movieList = response.body()?.results ?: listOf()
+                        onSuccess(movieList)
+                    } else {
+                        onFailure(response.message())
+                    }
+                }
+
+                override fun onFailure(call: Call<MovieListResponse>, t: Throwable) {
+                    onFailure(t.message ?: "")
+                }
+            }
+        )
+    }
+
+    override fun getGenres(onSuccess: (List<GenreVO>) -> Unit, onFailure: (String) -> Unit) {
+        mTheMovieApi?.getGenres()?.enqueue(
+            object : Callback<GetGenreResponse> {
+                override fun onResponse(
+                    call: Call<GetGenreResponse>,
+                    response: Response<GetGenreResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        onSuccess(response.body()?.genres ?: listOf())
+                    } else {
+                        onFailure(response.message())
+                    }
+                }
+
+                override fun onFailure(call: Call<GetGenreResponse>, t: Throwable) {
+                    onFailure(t.message ?: "")
+                }
+            }
+        )
+    }
+
+    override fun getMoviesByGenre(genreId: String, onSuccess: (List<MovieVO>) -> Unit, onFailure: (String) -> Unit) {
+        mTheMovieApi?.getMoviesByGenre(genreId = genreId)?.enqueue(
             object : Callback<MovieListResponse> {
                 override fun onResponse(
                     call: Call<MovieListResponse>,

@@ -10,6 +10,7 @@ import com.example.themovieapp.adapters.BannerAdapter
 import com.example.themovieapp.adapters.ShowcaseAdapter
 import com.example.themovieapp.data.models.MovieModel
 import com.example.themovieapp.data.models.MovieModelImpl
+import com.example.themovieapp.data.vos.GenreVO
 import com.example.themovieapp.delegates.BannerViewHolderDelegate
 import com.example.themovieapp.delegates.MovieViewHolderDelegate
 import com.example.themovieapp.delegates.ShowcaseViewHolderDelegate
@@ -29,6 +30,8 @@ class MainActivity : AppCompatActivity(), BannerViewHolderDelegate, ShowcaseView
 
     private val mMovieModel: MovieModel = MovieModelImpl
 
+    private var mGenres: List<GenreVO>? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -36,7 +39,6 @@ class MainActivity : AppCompatActivity(), BannerViewHolderDelegate, ShowcaseView
         setUpToolbar()
         setUpViewPods()
         setUpBannerViewPager()
-        setUpGenreTabLayout()
         setUpShowcaseRecyclerView()
         setUpListeners()
 
@@ -73,6 +75,35 @@ class MainActivity : AppCompatActivity(), BannerViewHolderDelegate, ShowcaseView
                 showError(it)
             }
         )
+
+        // Genre List
+        mMovieModel.getGenre(
+            onSuccess = {
+
+                mGenres = it
+
+                setUpGenreTabLayout(it)
+
+                it.firstOrNull()?.id?.let { genreId ->
+                    getMoviesById(genreId)
+                }
+            },
+            onFailure = {
+                showError(it)
+            }
+        )
+    }
+
+    private fun getMoviesById(genreId: Int) {
+        mMovieModel.getMoviesByGenre(
+            genreId = genreId.toString(),
+            onSuccess = {
+                mMoviesByGenreViewPod.setData(it)
+            },
+            onFailure = {
+                showError(it)
+            }
+        )
     }
 
     private fun showError(error: String) {
@@ -97,7 +128,9 @@ class MainActivity : AppCompatActivity(), BannerViewHolderDelegate, ShowcaseView
         //Genre Tab Layout
         tabLayoutGenre.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                Snackbar.make(window.decorView, tab?.text ?: "", Snackbar.LENGTH_LONG).show()
+                mGenres?.get(tab?.position ?: 0)?.id?.let {
+                    getMoviesById(it)
+                }
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {
@@ -110,10 +143,10 @@ class MainActivity : AppCompatActivity(), BannerViewHolderDelegate, ShowcaseView
         })
     }
 
-    private fun setUpGenreTabLayout() {
-        dummyGenreList.forEach {
+    private fun setUpGenreTabLayout(genreList: List<GenreVO>) {
+        genreList.forEach {
             tabLayoutGenre.newTab().apply {
-                text = it
+                text = it.name
                 tabLayoutGenre.addTab(this)
             }
         }
