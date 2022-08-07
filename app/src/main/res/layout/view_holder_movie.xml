@@ -13,7 +13,7 @@
         android:scaleType="centerCrop"/>
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvMovieName"
+        android:id="@+id/tvMovieDetailName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/ivMovieImage"
@@ -27,7 +27,7 @@
         android:id="@+id/tvMovieRating"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tvMovieName"
+        android:layout_below="@id/tvMovieDetailName"
         android:layout_marginTop="@dimen/margin_small"
         android:text="8.20"
         android:textColor="@color/white"/>
@@ -37,7 +37,7 @@
         style="?attr/ratingBarStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tvMovieName"
+        android:layout_below="@id/tvMovieDetailName"
         android:layout_marginStart="@dimen/margin_medium"
         android:layout_marginTop="@dimen/margin_small"
         android:layout_toEndOf="@id/tvMovieRating"

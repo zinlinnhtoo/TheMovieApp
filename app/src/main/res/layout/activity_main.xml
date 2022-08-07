@@ -181,6 +181,7 @@
                 android:paddingEnd="@dimen/margin_medium_2" />
 
             <include
+                android:id="@+id/vpActorsHomeScreen"
                 layout="@layout/view_pod_actor_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

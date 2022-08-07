@@ -15,6 +15,7 @@ import com.example.themovieapp.delegates.BannerViewHolderDelegate
 import com.example.themovieapp.delegates.MovieViewHolderDelegate
 import com.example.themovieapp.delegates.ShowcaseViewHolderDelegate
 import com.example.themovieapp.dummy.dummyGenreList
+import com.example.themovieapp.viewpods.ActorListViewPod
 import com.example.themovieapp.viewpods.MovieListViewPod
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
@@ -27,6 +28,7 @@ class MainActivity : AppCompatActivity(), BannerViewHolderDelegate, ShowcaseView
 
     lateinit var mBestPopularMovieListViewPod : MovieListViewPod
     lateinit var mMoviesByGenreViewPod: MovieListViewPod
+    lateinit var mActorListViewPod: ActorListViewPod
 
     private val mMovieModel: MovieModel = MovieModelImpl
 
@@ -92,6 +94,16 @@ class MainActivity : AppCompatActivity(), BannerViewHolderDelegate, ShowcaseView
                 showError(it)
             }
         )
+
+        // Actor
+        mMovieModel.getActors(
+            onSuccess = {
+                mActorListViewPod.setData(it)
+            },
+            onFailure = {
+                showError(it)
+            }
+        )
     }
 
     private fun getMoviesById(genreId: Int) {
@@ -113,6 +125,7 @@ class MainActivity : AppCompatActivity(), BannerViewHolderDelegate, ShowcaseView
     private fun setUpViewPods() {
         mBestPopularMovieListViewPod = vpBestPopularMovieList as MovieListViewPod
         mMoviesByGenreViewPod = vpMoviesByGenre as MovieListViewPod
+        mActorListViewPod = vpActorsHomeScreen as ActorListViewPod
 
         mBestPopularMovieListViewPod.setUpMovieListViewPod(this)
         mMoviesByGenreViewPod.setUpMovieListViewPod(this)
@@ -170,15 +183,15 @@ class MainActivity : AppCompatActivity(), BannerViewHolderDelegate, ShowcaseView
         return true
     }
 
-    override fun onTapMovieFromBanner() {
-        startActivity(MovieDetailActivity.newIntent(this))
+    override fun onTapMovieFromBanner(movieId: Int) {
+        startActivity(MovieDetailActivity.newIntent(this, movieId))
     }
 
-    override fun onTapMovieFromShowcase() {
-        startActivity(MovieDetailActivity.newIntent(this))
+    override fun onTapMovieFromShowcase(movieId: Int) {
+        startActivity(MovieDetailActivity.newIntent(this, movieId))
     }
 
-    override fun onTapMovie() {
-        startActivity(MovieDetailActivity.newIntent(this))
+    override fun onTapMovie(movieId: Int) {
+        startActivity(MovieDetailActivity.newIntent(this, movieId))
     }
 }

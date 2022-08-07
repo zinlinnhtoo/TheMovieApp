@@ -10,19 +10,25 @@ import kotlinx.android.synthetic.main.view_holder_movie.view.*
 
 class MovieViewHolder(itemView: View, private val mDelegate: MovieViewHolderDelegate) : RecyclerView.ViewHolder(itemView) {
 
-    private val mMovieVO: MovieVO? = null
+    private var mMovieVO: MovieVO? = null
 
     init {
-        itemView.setOnClickListener { mDelegate.onTapMovie() }
+        itemView.setOnClickListener {
+            mMovieVO?.let {
+                mDelegate.onTapMovie(it.id)
+            }
+        }
     }
 
     fun bindData(movie: MovieVO) {
+
+        mMovieVO = movie
 
         Glide.with(itemView.context)
             .load("$IMAGE_BASE_URL${movie.posterPath}")
             .into(itemView.ivMovieImage)
 
-        itemView.tvMovieName.text = movie.title
+        itemView.tvMovieDetailName.text = movie.title
         itemView.tvMovieRating.text = movie.voteAverage?.toString()
         itemView.rbMovieRating.rating = movie.getRatingBasedOnFiveStars()
     }

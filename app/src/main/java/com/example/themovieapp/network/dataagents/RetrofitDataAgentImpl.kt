@@ -1,8 +1,11 @@
 package com.example.themovieapp.network.dataagents
 
+import com.example.themovieapp.data.vos.ActorVO
 import com.example.themovieapp.data.vos.GenreVO
 import com.example.themovieapp.data.vos.MovieVO
 import com.example.themovieapp.network.TheMovieApi
+import com.example.themovieapp.network.responses.GetActorsResponse
+import com.example.themovieapp.network.responses.GetCreditByMovieResponse
 import com.example.themovieapp.network.responses.GetGenreResponse
 import com.example.themovieapp.network.responses.MovieListResponse
 import com.example.themovieapp.utils.BASE_URL
@@ -144,6 +147,79 @@ object RetrofitDataAgentImpl: MovieDataAgent {
                 }
 
                 override fun onFailure(call: Call<MovieListResponse>, t: Throwable) {
+                    onFailure(t.message ?: "")
+                }
+            }
+        )
+    }
+
+    override fun getActors(onSuccess: (List<ActorVO>) -> Unit, onFailure: (String) -> Unit) {
+        mTheMovieApi?.getActors()?.enqueue(
+            object : Callback<GetActorsResponse> {
+                override fun onResponse(
+                    call: Call<GetActorsResponse>,
+                    response: Response<GetActorsResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        val actorList = response.body()?.results ?: listOf()
+                        onSuccess(actorList)
+                    } else {
+                        onFailure(response.message())
+                    }
+                }
+
+                override fun onFailure(call: Call<GetActorsResponse>, t: Throwable) {
+                    onFailure(t.message ?: "")
+                }
+            }
+        )
+    }
+
+    override fun getMovieDetails(
+        movieId: String,
+        onSuccess: (MovieVO) -> Unit,
+        onFailure: (String) -> Unit
+    ) {
+        mTheMovieApi?.getMovieDetail(movieId = movieId)?.enqueue(
+            object : Callback<MovieVO> {
+                override fun onResponse(call: Call<MovieVO>, response: Response<MovieVO>) {
+                    if (response.isSuccessful) {
+                        response.body()?.let {
+                            onSuccess(it)
+                        }
+                    } else {
+                        onFailure(response.message())
+                    }
+                }
+
+                override fun onFailure(call: Call<MovieVO>, t: Throwable) {
+                    onFailure(t.message ?: "")
+                }
+            }
+        )
+    }
+
+    override fun getCreditsByMovie(
+        movieId: String,
+        onSuccess: (Pair<List<ActorVO>, List<ActorVO>>) -> Unit,
+        onFailure: (String) -> Unit
+    ) {
+        mTheMovieApi?.getCreditsByMovie(movieId)?.enqueue(
+            object : Callback<GetCreditByMovieResponse> {
+                override fun onResponse(
+                    call: Call<GetCreditByMovieResponse>,
+                    response: Response<GetCreditByMovieResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        response.body()?.let {
+                            onSuccess(Pair(it.cast ?: listOf(), it.crew ?: listOf()))
+                        }
+                    } else {
+                        onFailure(response.message())
+                    }
+                }
+
+                override fun onFailure(call: Call<GetCreditByMovieResponse>, t: Throwable) {
                     onFailure(t.message ?: "")
                 }
             }

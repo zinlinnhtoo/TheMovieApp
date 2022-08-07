@@ -1,10 +1,15 @@
 package com.example.themovieapp.network
 
+import com.example.themovieapp.data.vos.ActorVO
+import com.example.themovieapp.data.vos.MovieVO
+import com.example.themovieapp.network.responses.GetActorsResponse
+import com.example.themovieapp.network.responses.GetCreditByMovieResponse
 import com.example.themovieapp.network.responses.GetGenreResponse
 import com.example.themovieapp.network.responses.MovieListResponse
 import com.example.themovieapp.utils.*
 import retrofit2.Call
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface TheMovieApi {
@@ -36,4 +41,22 @@ interface TheMovieApi {
         @Query(PARAM_API_KEY) apiKey: String = MOVIE_API_KEY,
         @Query(PARAM_GENRE_ID) genreId: String
     ): Call<MovieListResponse>
+
+    @GET(API_GET_ACTORS)
+    fun getActors(
+        @Query(PARAM_API_KEY) apiKey: String = MOVIE_API_KEY,
+        @Query(PARAM_PAGE) page: Int = 1
+    ): Call<GetActorsResponse>
+
+    @GET("$API_GET_MOVIE_DETAIL/{movie_id}")
+    fun getMovieDetail(
+        @Path("movie_id") movieId: String,
+        @Query(PARAM_API_KEY) apiKey: String = MOVIE_API_KEY
+    ): Call<MovieVO>
+
+    @GET("$API_GET_CREDITS_BY_MOVIE/{movie_id}/credits")
+    fun getCreditsByMovie(
+        @Path("movie_id") movieId: String,
+        @Query(PARAM_API_KEY) apiKey: String = MOVIE_API_KEY
+    ): Call<GetCreditByMovieResponse>
 }
