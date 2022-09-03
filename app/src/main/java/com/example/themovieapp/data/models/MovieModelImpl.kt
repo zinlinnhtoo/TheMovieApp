@@ -1,31 +1,70 @@
 package com.example.themovieapp.data.models
 
-import com.example.themovieapp.data.vos.ActorVO
-import com.example.themovieapp.data.vos.GenreVO
-import com.example.themovieapp.data.vos.MovieVO
+import android.content.Context
+import com.example.themovieapp.data.vos.*
 import com.example.themovieapp.network.dataagents.MovieDataAgent
 import com.example.themovieapp.network.dataagents.RetrofitDataAgentImpl
+import com.example.themovieapp.persistence.MovieDatabase
 
-object MovieModelImpl: MovieModel {
+object MovieModelImpl : MovieModel {
 
     private val mMovieDataAgent: MovieDataAgent = RetrofitDataAgentImpl
+    private var mMovieDatabase: MovieDatabase? = null
+
+    fun initDatabase(context: Context) {
+        mMovieDatabase = MovieDatabase.getDBInstance(context)
+    }
 
     override fun getNowPlayingMovies(
         onSuccess: (List<MovieVO>) -> Unit,
         onFailure: (String) -> Unit
     ) {
-        mMovieDataAgent.getNowPlayingMovies(onSuccess = onSuccess, onFailure = onFailure)
+        //database
+        onSuccess(mMovieDatabase?.movieDao()?.getMoviesByType(type = NOW_PLAYING) ?: listOf())
+
+        mMovieDataAgent.getNowPlayingMovies(
+            onSuccess = {
+                it.forEach { movie ->
+                    movie.type = NOW_PLAYING
+                }
+                mMovieDatabase?.movieDao()?.insertMovies(it)
+                onSuccess(it)
+            },
+            onFailure = onFailure
+        )
     }
 
     override fun getPopularMovies(onSuccess: (List<MovieVO>) -> Unit, onFailure: (String) -> Unit) {
-        mMovieDataAgent.getPopularMovies(onSuccess, onFailure)
+        //database
+        onSuccess(mMovieDatabase?.movieDao()?.getMoviesByType(type = POPULAR) ?: listOf())
+
+        mMovieDataAgent.getPopularMovies(
+            onSuccess = {
+                it.forEach { movie ->
+                    movie.type = POPULAR
+                }
+                mMovieDatabase?.movieDao()?.insertMovies(it)
+                onSuccess(it)
+            },
+            onFailure
+        )
     }
 
     override fun getTopRatedMovies(
         onSuccess: (List<MovieVO>) -> Unit,
         onFailure: (String) -> Unit
     ) {
-        mMovieDataAgent.getTopRatedMovies(onSuccess, onFailure)
+        //database
+        onSuccess(mMovieDatabase?.movieDao()?.getMoviesByType(type = TOP_RATED) ?: listOf())
+
+        mMovieDataAgent.getTopRatedMovies(
+            onSuccess = {
+                it.forEach { movie -> movie.type = TOP_RATED }
+                mMovieDatabase?.movieDao()?.insertMovies(it)
+                onSuccess(it)
+            },
+            onFailure
+        )
     }
 
     override fun getGenre(onSuccess: (List<GenreVO>) -> Unit, onFailure: (String) -> Unit) {
@@ -53,7 +92,21 @@ object MovieModelImpl: MovieModel {
         onSuccess: (MovieVO) -> Unit,
         onFailure: (String) -> Unit
     ) {
-        mMovieDataAgent.getMovieDetails(movieId = movieId, onSuccess, onFailure)
+        //database
+        val movieFromDatabase = mMovieDatabase?.movieDao()?.getMovieById(movieId = movieId.toInt())
+        movieFromDatabase?.let(onSuccess)
+
+        mMovieDataAgent.getMovieDetails(
+            movieId = movieId,
+            onSuccess = {
+                        val movieFromDatabase =
+                            mMovieDatabase?.movieDao()?.getMovieById(movieId = movieId.toInt())
+                it.type = movieFromDatabase?.type
+                mMovieDatabase?.movieDao()?.insertSingleMovie(it)
+                onSuccess(it)
+            },
+            onFailure
+        )
     }
 
     override fun getCreditsByMovie(
