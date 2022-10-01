@@ -3,6 +3,7 @@ package com.example.themovieapp.activities
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.themovieapp.R
@@ -172,6 +173,16 @@ class MainActivity : AppCompatActivity(), BannerViewHolderDelegate, ShowcaseView
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_discover, menu)
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.search -> {
+                startActivity(MovieSearchActivity.newIntent(this))
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onTapMovieFromBanner(movieId: Int) {

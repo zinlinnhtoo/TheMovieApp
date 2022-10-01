@@ -3,9 +3,10 @@ package com.example.themovieapp.data.models
 import androidx.lifecycle.LiveData
 import com.example.themovieapp.data.vos.*
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
 
-object MovieModelImpl : BaseModel(),MovieModel {
+object MovieModelImpl : BaseModel(), MovieModel {
 
 
     override fun getNowPlayingMovies(
@@ -121,4 +122,14 @@ object MovieModelImpl : BaseModel(),MovieModel {
                 onFailure(it.localizedMessage.orEmpty())
             })
     }
+
+    override fun searchMovie(query: String): Observable<List<MovieVO>> {
+        return mMovieApi
+            .searchMovie(query = query)
+            .map { it.results ?: listOf() }
+            .onErrorResumeNext { Observable.just(listOf()) }
+            .subscribeOn(Schedulers.io())
+    }
+
+
 }
