@@ -1,24 +1,22 @@
 package com.example.themovieapp.data.models
 
+import androidx.lifecycle.LiveData
 import com.example.themovieapp.data.vos.ActorVO
 import com.example.themovieapp.data.vos.GenreVO
 import com.example.themovieapp.data.vos.MovieVO
 
 interface MovieModel {
     fun getNowPlayingMovies(
-        onSuccess: (List<MovieVO>) -> Unit,
         onFailure: (String) -> Unit
-    )
+    ): LiveData<List<MovieVO>>?
 
     fun getPopularMovies(
-        onSuccess: (List<MovieVO>) -> Unit,
         onFailure: (String) -> Unit
-    )
+    ): LiveData<List<MovieVO>>?
 
     fun getTopRatedMovies(
-        onSuccess: (List<MovieVO>) -> Unit,
         onFailure: (String) -> Unit
-    )
+    ): LiveData<List<MovieVO>>?
 
     fun getGenre(
         onSuccess: (List<GenreVO>) -> Unit,
@@ -38,9 +36,8 @@ interface MovieModel {
 
     fun getMovieDetails(
         movieId: String,
-        onSuccess: (MovieVO) -> Unit,
         onFailure: (String) -> Unit
-    )
+    ): LiveData<MovieVO?>?
 
     fun getCreditsByMovie(
         movieId: String,

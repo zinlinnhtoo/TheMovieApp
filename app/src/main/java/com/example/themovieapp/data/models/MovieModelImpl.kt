@@ -1,5 +1,6 @@
 package com.example.themovieapp.data.models
 
+import androidx.lifecycle.LiveData
 import com.example.themovieapp.data.vos.*
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -8,60 +9,48 @@ object MovieModelImpl : BaseModel(),MovieModel {
 
 
     override fun getNowPlayingMovies(
-        onSuccess: (List<MovieVO>) -> Unit,
         onFailure: (String) -> Unit
-    ) {
-        //database
-        onSuccess(mMovieDatabase?.movieDao()?.getMoviesByType(type = NOW_PLAYING) ?: listOf())
-
+    ): LiveData<List<MovieVO>>? {
         mMovieApi.getNowPlayingMovies(page = 1)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 it.results?.forEach { movie -> movie.type = NOW_PLAYING }
                 mMovieDatabase?.movieDao()?.insertMovies(it.results ?: listOf())
-
-                onSuccess(it.results ?: listOf())
             }, {
                 onFailure(it.localizedMessage.orEmpty())
             })
+        return mMovieDatabase?.movieDao()?.getMoviesByType(type = NOW_PLAYING)
     }
 
-    override fun getPopularMovies(onSuccess: (List<MovieVO>) -> Unit, onFailure: (String) -> Unit) {
-        //database
-        onSuccess(mMovieDatabase?.movieDao()?.getMoviesByType(type = POPULAR) ?: listOf())
-
+    override fun getPopularMovies(
+        onFailure: (String) -> Unit
+    ): LiveData<List<MovieVO>>? {
         mMovieApi.getPopularMovies(page = 1)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 it.results?.forEach { movie -> movie.type = POPULAR }
                 mMovieDatabase?.movieDao()?.insertMovies(it.results ?: listOf())
-
-                onSuccess(it.results ?: listOf())
             }, {
                 onFailure(it.localizedMessage.orEmpty())
             })
+        return mMovieDatabase?.movieDao()?.getMoviesByType(type = POPULAR)
     }
 
     override fun getTopRatedMovies(
-        onSuccess: (List<MovieVO>) -> Unit,
         onFailure: (String) -> Unit
-    ) {
-        //database
-        onSuccess(mMovieDatabase?.movieDao()?.getMoviesByType(type = TOP_RATED) ?: listOf())
-
+    ): LiveData<List<MovieVO>>? {
         mMovieApi.getPopularMovies(page = 1)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 it.results?.forEach { movie -> movie.type = TOP_RATED }
                 mMovieDatabase?.movieDao()?.insertMovies(it.results ?: listOf())
-
-                onSuccess(it.results ?: listOf())
             }, {
                 onFailure(it.localizedMessage.orEmpty())
             })
+        return mMovieDatabase?.movieDao()?.getMoviesByType(type = TOP_RATED)
     }
 
     override fun getGenre(onSuccess: (List<GenreVO>) -> Unit, onFailure: (String) -> Unit) {
@@ -103,25 +92,19 @@ object MovieModelImpl : BaseModel(),MovieModel {
 
     override fun getMovieDetails(
         movieId: String,
-        onSuccess: (MovieVO) -> Unit,
         onFailure: (String) -> Unit
-    ) {
-        //database
-        val movieFromDatabase = mMovieDatabase?.movieDao()?.getMovieById(movieId = movieId.toInt())
-        movieFromDatabase?.let(onSuccess)
-
+    ): LiveData<MovieVO?>? {
         mMovieApi.getMovieDetail(movieId = movieId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                val movieFromDatabaseToSync = mMovieDatabase?.movieDao()?.getMovieById(movieId = movieId.toInt())
+                val movieFromDatabaseToSync = mMovieDatabase?.movieDao()?.getMovieByIdOneTime(movieId = movieId.toInt())
                 it.type = movieFromDatabaseToSync?.type
                 mMovieDatabase?.movieDao()?.insertSingleMovie(it)
-
-                onSuccess(it)
             }, {
                 onFailure(it.localizedMessage.orEmpty())
             })
+        return mMovieDatabase?.movieDao()?.getMovieById(movieId = movieId.toInt())
     }
 
     override fun getCreditsByMovie(

@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.example.themovieapp.R
 import com.example.themovieapp.data.models.MovieModel
@@ -52,13 +53,10 @@ class MovieDetailActivity : AppCompatActivity() {
     private fun requestData(movieId: Int) {
         mMovieModel.getMovieDetails(
             movieId = movieId.toString(),
-            onSuccess = {
-                bindData(it)
-            },
-            onFailure = {
-                Snackbar.make(window.decorView, it, Snackbar.LENGTH_LONG).show()
-            }
-        )
+            onFailure = { showError(it) }
+        )?.observe(this) {
+            it?.let { movieDetails -> bindData(movieDetails) }
+        }
 
         mMovieModel.getCreditsByMovie(
             movieId = movieId.toString(),
@@ -127,5 +125,9 @@ class MovieDetailActivity : AppCompatActivity() {
                 tvSecondGenre.visibility = View.GONE
             }
         }
+    }
+
+    private fun showError(error: String) {
+        Toast.makeText(this, error, Toast.LENGTH_LONG).show()
     }
 }

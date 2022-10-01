@@ -49,34 +49,25 @@ class MainActivity : AppCompatActivity(), BannerViewHolderDelegate, ShowcaseView
 
     private fun requestData() {
         // Now Playing Movies
-        mMovieModel.getNowPlayingMovies(
-            onSuccess = {
-                mBannerAdapter.setNewData(it)
-            },
-            onFailure = {
-                showError(it)
-            }
-        )
+        mMovieModel.getNowPlayingMovies {
+            showError(it)
+        }?.observe(this) {
+            mBannerAdapter.setNewData(it)
+        }
 
         // Popular Movies
-        mMovieModel.getPopularMovies(
-            onSuccess = {
-                mBestPopularMovieListViewPod.setData(it)
-            },
-            onFailure = {
-                showError(it)
-            }
-        )
+        mMovieModel.getPopularMovies {
+            showError(it)
+        }?.observe(this) {
+            mBestPopularMovieListViewPod.setData(it)
+        }
 
         // Top Rated Movies
-        mMovieModel.getTopRatedMovies(
-            onSuccess = {
-                mShowcaseAdapter.setNewData(it)
-            },
-            onFailure = {
-                showError(it)
-            }
-        )
+        mMovieModel.getTopRatedMovies {
+            showError(it)
+        }?.observe(this) {
+            mShowcaseAdapter.setNewData(it)
+        }
 
         // Genre List
         mMovieModel.getGenre(
