@@ -22,6 +22,8 @@ import com.example.themovieapp.dummy.dummyGenreList
 import com.example.themovieapp.mvp.presenters.MainPresenter
 import com.example.themovieapp.mvp.presenters.MainPresenterImpl
 import com.example.themovieapp.mvp.views.MainView
+import com.example.themovieapp.routers.navigateToMovieDetailActivity
+import com.example.themovieapp.routers.navigateToMovieSearchActivity
 import com.example.themovieapp.viewpods.ActorListViewPod
 import com.example.themovieapp.viewpods.MovieListViewPod
 import com.google.android.material.snackbar.Snackbar
@@ -124,7 +126,7 @@ class MainActivity : AppCompatActivity(),
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.search -> {
-                startActivity(MovieSearchActivity.newIntent(this))
+                navigateToMovieSearchActivity()
                 return true
             }
         }
@@ -156,7 +158,7 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun navigateToMovieDetailScreen(movieId: Int) {
-        startActivity(MovieDetailActivity.newIntent(this, movieId))
+        navigateToMovieDetailActivity(movieId)
     }
 
     override fun showError(errorString: String) {
