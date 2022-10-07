@@ -6,19 +6,25 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.themovieapp.R
 import com.example.themovieapp.data.models.MovieModel
 import com.example.themovieapp.data.models.MovieModelImpl
+import com.example.themovieapp.data.vos.ActorVO
 import com.example.themovieapp.data.vos.GenreVO
 import com.example.themovieapp.data.vos.MovieVO
+import com.example.themovieapp.mvp.presenters.IBasePresenter
+import com.example.themovieapp.mvp.presenters.MovieDetailPresenter
+import com.example.themovieapp.mvp.presenters.MovieDetailPresenterImpl
+import com.example.themovieapp.mvp.views.MovieDetailView
 import com.example.themovieapp.utils.IMAGE_BASE_URL
 import com.example.themovieapp.viewpods.ActorListViewPod
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_movie_detail.*
 import kotlinx.android.synthetic.main.view_holder_movie.*
 
-class MovieDetailActivity : AppCompatActivity() {
+class MovieDetailActivity : AppCompatActivity(), MovieDetailView{
 
     companion object {
 
@@ -35,39 +41,26 @@ class MovieDetailActivity : AppCompatActivity() {
     lateinit var actorsViewPod: ActorListViewPod
     lateinit var creatorsViewPod: ActorListViewPod
 
-    private val mMovieModel: MovieModel = MovieModelImpl
+    private lateinit var mPresenter: MovieDetailPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_movie_detail)
+
+        setUpPresenter()
 
         setUpViewPods()
         setUpListeners()
 
         val movieId = intent?.getIntExtra(EXTRA_MOVIE_ID, 0)
         movieId?.let {
-            requestData(it)
+            mPresenter.onUiReadyInMovieDetail(this, movieId)
         }
     }
 
-    private fun requestData(movieId: Int) {
-        mMovieModel.getMovieDetails(
-            movieId = movieId.toString(),
-            onFailure = { showError(it) }
-        )?.observe(this) {
-            it?.let { movieDetails -> bindData(movieDetails) }
-        }
-
-        mMovieModel.getCreditsByMovie(
-            movieId = movieId.toString(),
-            onSuccess = {
-                actorsViewPod.setData(it.first)
-                creatorsViewPod.setData(it.second)
-            },
-            onFailure = {
-                Snackbar.make(window.decorView, it, Snackbar.LENGTH_LONG).show()
-            }
-        )
+    private fun setUpPresenter() {
+        mPresenter = ViewModelProvider(this)[MovieDetailPresenterImpl::class.java]
+        mPresenter.initView(this)
     }
 
     private fun setUpListeners() {
@@ -127,7 +120,21 @@ class MovieDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun showError(error: String) {
-        Toast.makeText(this, error, Toast.LENGTH_LONG).show()
+    override fun showMovieDetails(movie: MovieVO) {
+        bindData(movie)
     }
+
+    override fun showCreditsByMovie(cast: List<ActorVO>, crew: List<ActorVO>) {
+        actorsViewPod.setData(cast)
+        creatorsViewPod.setData(crew)
+    }
+
+    override fun navigateBack() {
+        finish()
+    }
+
+    override fun showError(errorString: String) {
+        Toast.makeText(this, errorString, Toast.LENGTH_SHORT).show()
+    }
+
 }

@@ -69,4 +69,5 @@ dependencies {
     implementation "com.jakewharton.rxbinding4:rxbinding-appcompat:4.0.0"
 
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1"
 }
